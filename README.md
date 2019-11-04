@@ -22,7 +22,7 @@ formats other than RDF/XML.
 
 ### Binaries
 
-A JAR file can be downloaded [here](releases). It comes bundled with
+A JAR file can be downloaded [here](../../releases). It comes bundled with
 all dependencies, hence no external library is required.
 
 ### Compilation
