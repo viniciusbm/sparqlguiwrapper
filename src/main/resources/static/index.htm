@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SPARQL Wrapper</title>
+        <link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHfSURBVDiNY2CgJ7AzM1MszojvQxZjIlZzZLCvhoyEqAInO+fjsqykiQwMDIyxIT41jMRoLkyLd2NiYgwXERF6/u7dB1k2FuaLn79+D+RiY59ElO21BVlzpaWlhRkYGBh66subk6IDPC0MDBQIeqEiN81tckv1rBev3xxNCPGZLC0tLfzzxw8lVka2PAbmf+IMDAwMOL0Q6etpLy8vVXTn/tPlpvpa6u/efzjFwsoS8uXbtxUT5yw5xcDA8BGfAYwMDAxM5dnJixgZmQQZ/v978+rte85TV87nXLly/yWyQhYsmtmCvFxPqSor7D1+8mKNpaluCwsLy9Z5K9atxGYTigE+rnaq7BwczApSkufu3n/IYmOhv+Tx8xe3fn779QqXV+EGlGYmh7KyMgeJCAoI7Dt8cpqBnmZRy4QZtgwMDKwMDAw/cRnAxMDAwOBua2HEwsok++vX71cPnzz//OrLy2P3Hj15wcDA8B+fZgYGBgamqtw0b00N9fz2SbOncHJxPOTl5f5/6tSNt8vWbYmHGoAXMHs4WYdxcLAzm+rrxv7580eEgeH/OUEe7p+37j96QkgzHHjYW1kyMDCw56fGrmdgYOAgWiMDNAx2HDx2PDLAq4iLk20dAwPDD1IMAACDkprseeZwaAAAAABJRU5ErkJggg==" />
+
+        <script src="codemirror/codemirror.js"></script>
+        <link rel="stylesheet" href="codemirror/codemirror.css">
+        <script src="codemirror/sparql.js"></script>
+
+        <link rel="stylesheet" href="style.css">
+        <script src="s.js"></script>
+    </head>
+
+    <body>
+        <div id="top-wrapper">
+            <div id="header">
+                <div>
+                    <br/>
+                    <strong>SPARQL Query:</strong>
+                </div>
+                <div id="connection-msg">
+                    <span class="yes">Connected.</span>
+                    <span class="no">Disconnected. Please check if the program is running and the server is listening to the correct port.</span>
+                </div>
+                <div id="ontology-corner">
+                    <strong>Ontology file: </strong>
+                    <span id="ontology-fn"></span>
+                    <br/>
+                    <strong>Ontology URI: </strong>
+                    <span id="ontology-uri"></span>
+                </div>
+            </div>
+            <div id="field-wrapper">
+                <textarea id="query-field">PREFIX  rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX  owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX  xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX     : &lt;http://your/ontology/here#&gt;
+
+</textarea>
+            <div id="error-icon">
+                <div id="inline-error-msg"></div>
+            </div>
+            </div>
+        </div>
+        <div id="middle-wrapper">
+            <div id="running"></div>
+            <button id="submit-btn">
+                Execute query
+            </button>
+            <div id="result-count"></div>
+        </div>
+        <div id="bottom-wrapper">
+            <div id="error-result-msg"></div>
+            <table id="result-table">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </body>
+
+</html>

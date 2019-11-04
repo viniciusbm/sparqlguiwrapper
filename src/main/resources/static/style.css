@@ -1,0 +1,239 @@
+#middle-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+#submit-btn {
+    border-radius: 10px;
+    font-weight: bold;
+    padding: 5px 15px;
+    color: white;
+    background-color: green;
+    border-color: darkgreen;
+}
+
+#submit-btn:hover {
+    border-color: black;
+}
+
+#submit-btn:active {
+    position: relative;
+    top: 3px;
+}
+
+#header > div {
+    width: 31%;
+}
+
+#result-count {
+    color: darkgreen;
+    font-size: 120%;
+    min-width: 30vw;
+    text-align: right;
+}
+
+#running {
+    min-width: 30vw;
+    text-align: left;
+    font-size: 120%;
+    color: darkgreen;
+}
+
+#connection-msg {
+    text-align: center;
+}
+
+#connection-msg .yes,
+#connection-msg .no {
+    display: none;
+}
+
+#connection-msg .yes {
+    color: darkgreen;
+}
+
+#connection-msg .no {
+    color: darkred;
+}
+
+#inline-error-msg {
+    background-color: #FFB2B2B2;
+    border: 1px solid red;
+    color: #37000F;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    transform: translate(0, 1px);
+    white-space: pre;
+    font-family: monospace;
+    font-size: 90%;
+}
+
+#error-result-msg {
+    color: #800000;
+    font-family: monospace;
+    font-size: 105%;
+    border: 1px solid red;
+    border-radius: 1px;
+    padding: 3px;
+    visibility: hidden;
+    text-align: left;
+}
+
+#field-wrapper {
+    border:        2px solid black;
+    margin-bottom: 10px;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+#ontology-fn, #ontology-uri {
+    color: darkslategrey;
+    font-size: 80%;
+}
+
+#bottom-wrapper {
+    height:     45vh;
+    margin-top: 10px;
+    overflow:   auto;
+    text-align: center;
+}
+
+#ontology-corner {
+    text-align: right;
+}
+
+#result-table {
+    border-collapse: collapse;
+    margin-left:     auto;
+    margin-right:    auto;
+}
+
+#result-table td, #result-table th {
+    padding-top:    5px;
+    padding-bottom: 5px;
+    padding-left:  10px;
+    padding-right: 10px;
+}
+
+.resource, .literal, .nullcell {
+    position: relative;
+}
+
+.resource .fullName,
+.literal .type,
+.nullcell .nulltooltip {
+    visibility: hidden;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    transform: translate(-50%, 30%);
+}
+
+.resource .fullName::after,
+.literal .type::after,
+.nullcell .nulltooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 95%;
+    left: 50%;
+    margin-left: -10px;
+    border-width: 15px;
+    border-style: solid;
+}
+
+.literal .type {
+    background-color: #662329;
+}
+
+.literal .type::after {
+    border-color: transparent transparent #662329 transparent;
+}
+
+.resource .fullName {
+    background-color: #874B82;
+}
+
+.resource .fullName::after {
+    border-color: transparent transparent #874B82 transparent;
+}
+
+.nullcell .nulltooltip {
+    background-color: red;
+}
+
+.nullcell .nulltooltip::after {
+    border-color: transparent transparent red transparent;
+}
+
+.resource {
+    color: #5C3358;
+}
+
+.literal {
+    color: #1E5728;
+}
+
+#result-table td,
+#result-table th {
+    border: 1px solid grey;
+}
+
+#result-table td:not(:first-child) {
+    font-family: monospace;
+}
+
+#result-table td:not(:first-child):hover {
+    background-color: #FFFCD8;
+}
+
+#result-table td:first-child {
+    text-align: right;
+}
+
+#result-table td:first-child,
+#result-table th:first-child {
+    border: none;
+    padding: 3px;
+}
+
+.resource:hover .fullName,
+.literal:hover .type,
+.nullcell:hover .nulltooltip {
+    visibility: visible;
+    transition-delay: 0.2s;
+}
+
+
+.CodeMirror {
+    font-family: monospace;
+    font-size:   16px;
+    height:      40vh;
+}
+
+.CodeMirror .error {
+   text-decoration: underline;
+   text-decoration-style: double;
+   text-decoration-color: red;
+}
+
+#error-icon {
+   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAARrSURBVFiFrZfNbxtFGIefmd20ib/WTdLSr0OoKnGjSHyIXpCTprhNWqmiPSab/AfABS5ABUJIPSDEf9A6jXqiFCkmUhpXPiAVCQm1cAOpIAU1TeNEabz+IN7d4bDxZh3b8db0d9uZd+f5vbMz884KQkqNjhqOUheQclgpdQoYAozt7g3gbwEPgLzW0zMn5uc3w4wrOoLPnj3qKHVVwSTQF9JvRcAtW6lrvbncH10ZUKdP99mRyCcI8QEQCQnerRrwrW7bn4p8vhragEqnj9iuewel3uoSvFu/6lJeEgsLSx0NbKXTp4TjZIFjLwi+TRL/uK47vj+X+y3YLIMPKpU6LFx3DjjmRiIUTRPn4MGumW4iQdE0cZNJUOq4FGJejYw0JOYbUKlUr63r36PUcTcSwTJN7KEhLNPEOXSoa7g9NERxagrHMACO2lL+oC5e9NeUb8DWtC+BtwFKV674UDcaxZqYwB0YCA83DIrT07j9/f5z+dKlevfrdrV6tcFAdXj4FYR4v94YzWaRlrUzYCxGcWoKd3AwXOaTk9601yGWRTSb3QlS6sNqOn3SN6Br2keA7r+wtkb8xo1mE6a550z433w78zo8nskgC4VgaI9u2x8DCHX+fMKu1ZZpsdfdwUEvm3h8Z8DNTW/A9fVu4XWV9ErliHRqtQut4ACyUCA+M4MsFptBBw78HzhA1OntHZMoNdwuwjeRybQ2kUx2C/ckxIiojY7+Aryxd+T25zBN3FhsB7Sx4fUFF1ybT9RGP0vg5TCRslAgfv06cnOnyLnJZNNqj9+8GRYOcEICibDRcn3dy26zudKGnvZGGRJQz/MG6vnCO0kCoS4OAE4y6a2DRPOkubEYxYmJht0RQs8k8FeYSLe/H2t6Gtcw/DZZLCKqO2XeTSS8EzOwIzrokRRKPewU5SST3oEUyLy+4OKZDLJSaTSxa1u2kxDioUTKe3sFuYaBZZqNmZdK3gG1uor25AmxmRlkudyNiZzUdD0LlFv1uobhTWlwq5VKHnB11W/b00T7NVHSarV5KebnN4UQt1rC65eJOrxcJpbJoD192jSatrLinRPBAraHCQGzIp+3JIAN1/AukG1f9OGBzHdLFgrNVbRFIsDWNtMrx7137/6JEN/Ue8tjY43wSoXYzEzLzJtMrK1562OXifK5c4H0xde9i4uPfAMAeq12Fe/HguidO2iPH3ux1Sqx2Vm0lZWOcN/E6qo3E9snplxbIzI3V+++r+v6576X4IvVdPqk5jg/AS+pvj5Kly/Tl8uhLS+HhgflDgxQGh8nevs20rJQsNSj1Jsil/OzabqW/3vmzKtSyixKHe+K2kYKlhSM719c/D3Y3vrHJJUatDXtO4R45wXx7+u2/Z7I55/s7pCtokU+X9D37XsXpb4ArFYxIbWFUl/pPT3DreAQ5uc0lTrs6PpnCkwgGhJsCSFma0Jc61tY2LPWdDQQMBJzdH0MIUaUUq/hXWSSeOX8GfBIwAOEuKcJ8aNYWCiFGfc/JPILqWnd5NsAAAAASUVORK5CYII=);
+   background-size: 100% 100%;
+   width: 20px;
+   height: 20px;
+   visibility: hidden;
+   position: absolute;
+   z-index: 9999;
+}
