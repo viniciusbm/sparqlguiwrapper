@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -27,12 +29,16 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
+import javax.swing.Box;
+import javax.swing.Box.Filler;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextField;
@@ -59,10 +65,13 @@ public class MainWindow extends JFrame {
 
     private JTextField ontologyField;
     private JButton btnStart;
+    private final Component verticalGlue = Box.createVerticalGlue();
+    private JLabel statusLabel;
 
     public MainWindow() {
-        setResizable(false);
-        setAlwaysOnTop(true);
+        if (SystemUtils.IS_OS_WINDOWS)
+            getContentPane().setBackground(SystemColor.control);
+        setMinimumSize(new Dimension(600, 150));
         try {
             if (SystemUtils.IS_OS_LINUX)
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
@@ -73,53 +82,45 @@ public class MainWindow extends JFrame {
         }
 
         setTitle("SPARQL GUI Wrapper");
-        setSize(900, 140);
+        setSize(800, 150);
 
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getContentPane().setLayout(null);
 
-        JLabel ontologyLabel = new JLabel("<html>Inferred OWL ontology<br/><small>(RDF/XML format)</small></html>");
-        ontologyLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-        ontologyLabel.setBounds(0, 47, 165, 58);
-        ontologyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ontologyLabel.setFocusable(false);
-        ontologyLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-        getContentPane().add(ontologyLabel);
+        setIconImage(new ImageIcon(MainWindow.class.getResource("/static/icon.png")).getImage());
 
-        ontologyField = new JTextField();
-        ontologyField.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        ontologyField.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                selectOntology();
-            }
-        });
-        ontologyField.setEditable(false);
-        ontologyField.setBackground(Color.WHITE);
-        ontologyField.setBounds(177, 58, 610, 34);
-        getContentPane().add(ontologyField);
-        ontologyField.setColumns(10);
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        verticalGlue.setBackground(SystemColor.window);
+        getContentPane().add(verticalGlue);
 
-        JButton ontologyChooseButton = new JButton("Choose...");
-        ontologyChooseButton.setFont(new Font("SansSerif", Font.BOLD, 12));
-        ontologyChooseButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                selectOntology();
-            }
-        });
-        ontologyChooseButton.setBounds(789, 58, 93, 34);
-        getContentPane().add(ontologyChooseButton);
+        JPanel panel = new JPanel();
+        getContentPane().add(panel);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+        JLabel portLabel = new JLabel("<html>Port</html>");
+        portLabel.setMaximumSize(new Dimension(80, 17));
+        portLabel.setPreferredSize(new Dimension(50, 17));
+        portLabel.setMinimumSize(new Dimension(50, 30));
+        panel.add(portLabel);
+        portLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        portLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+        portLabel.setFocusable(false);
+        portLabel.setAlignmentX(0.5f);
+
+        Filler filler_2 = new Filler(new Dimension(15, 0), new Dimension(50, 0), new Dimension(Short.MAX_VALUE, 0));
+        filler_2.setMaximumSize(new Dimension(50, 0));
+        filler_2.setPreferredSize(new Dimension(20, 0));
+        panel.add(filler_2);
 
         JSpinner portField = new JSpinner();
+        portField.setMaximumSize(new Dimension(32767, 40));
+        panel.add(portField);
         portField.setFont(new Font("SansSerif", Font.BOLD, 12));
         portField.setValue(port);
         ((SpinnerNumberModel) portField.getModel()).setMinimum(1025);
         ((SpinnerNumberModel) portField.getModel()).setMaximum(65535);
         NumberEditor ne_portField = new JSpinner.NumberEditor(portField, "#");
         portField.setEditor(ne_portField);
-        portField.setBounds(86, 13, 79, 34);
         portField.getEditor().getComponent(0).setBackground(Color.WHITE);
         portField.addChangeListener(new ChangeListener() {
             @Override
@@ -127,37 +128,15 @@ public class MainWindow extends JFrame {
                 port = (int) portField.getValue();
             }
         });
-        getContentPane().add(portField);
+        portField.setValue(port);
 
-        JLabel portLabel = new JLabel("<html>Port</html>");
-        portLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-        portLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-        portLabel.setFocusable(false);
-        portLabel.setAlignmentX(0.5f);
-        portLabel.setBounds(12, 12, 65, 34);
-        getContentPane().add(portLabel);
-
-        JLabel statusLabel = new JLabel("<html></html>");
-        statusLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-        statusLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent ev) {
-                if (server == null)
-                    return;
-                try {
-                    Desktop.getDesktop().browse(new URI(url));
-                    setState(JFrame.ICONIFIED);
-                } catch (IOException | URISyntaxException e) {
-                    JOptionPane.showMessageDialog(null, "Go to " + url, "Open your browser",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        });
-        statusLabel.setBorder(null);
-        statusLabel.setBounds(266, 12, 521, 34);
-        getContentPane().add(statusLabel);
+        Filler filler0 = new Box.Filler(new Dimension(20, 0), new Dimension(30, 0), new Dimension(Short.MAX_VALUE, 0));
+        panel.add(filler0);
 
         btnStart = new JButton("Start");
+        btnStart.setPreferredSize(new Dimension(63, 44));
+        btnStart.setMaximumSize(new Dimension(63, 44));
+        panel.add(btnStart);
         btnStart.setFont(new Font("SansSerif", Font.BOLD, 12));
         btnStart.addActionListener(new ActionListener() {
             @Override
@@ -187,11 +166,40 @@ public class MainWindow extends JFrame {
                 btnStart.setEnabled(true);
             }
         });
-        btnStart.setBounds(177, 12, 83, 34);
+        btnStart.setVisible(false);
 
-        getContentPane().add(btnStart);
+        Filler filler = new Box.Filler(new Dimension(10, 0), new Dimension(30, 0), new Dimension(100, 0));
+        panel.add(filler);
+
+        statusLabel = new JLabel("<html></html>");
+        statusLabel.setSize(new Dimension(40, 17));
+        statusLabel.setMinimumSize(new Dimension(40, 17));
+        panel.add(statusLabel);
+        statusLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        statusLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent ev) {
+                if (server == null)
+                    return;
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                    setState(JFrame.ICONIFIED);
+                } catch (IOException | URISyntaxException e) {
+                    JOptionPane.showMessageDialog(null, "Go to " + url, "Open your browser",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
+        statusLabel.setBorder(null);
+
+        Filler filler_1 = new Box.Filler(new Dimension(2, 0), new Dimension(20, 0), new Dimension(Short.MAX_VALUE, 0));
+        panel.add(filler_1);
 
         JButton btnrefreshontology = new JButton("<html>Refresh<br/>ontology</html>");
+        btnrefreshontology.setMaximumSize(new Dimension(300, 44));
+        btnrefreshontology.setPreferredSize(new Dimension(90, 44));
+        btnrefreshontology.setMinimumSize(new Dimension(88, 44));
+        panel.add(btnrefreshontology);
         btnrefreshontology.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -201,14 +209,71 @@ public class MainWindow extends JFrame {
             }
         });
         btnrefreshontology.setFont(new Font("SansSerif", Font.BOLD, 11));
-        btnrefreshontology.setBounds(789, 12, 93, 34);
-        getContentPane().add(btnrefreshontology);
 
-        setIconImage(new ImageIcon(MainWindow.class.getResource("/static/icon.png")).getImage());
+        Filler filler_6 = new Filler(new Dimension(2, 0), new Dimension(5, 0), new Dimension(20, 0));
+        panel.add(filler_6);
+
+        Component verticalGlue_1 = Box.createVerticalGlue();
+        verticalGlue_1.setBackground(SystemColor.window);
+        getContentPane().add(verticalGlue_1);
+
+        JPanel panel_1 = new JPanel();
+        getContentPane().add(panel_1);
+        panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+
+        Filler filler_5 = new Filler(new Dimension(1, 0), new Dimension(2, 0), new Dimension(10, 0));
+        panel_1.add(filler_5);
+
+        JLabel ontologyLabel = new JLabel("<html>Inferred OWL ontology<br/><small>(RDF/XML format)</small></html>");
+        ontologyLabel.setPreferredSize(new Dimension(150, 44));
+        ontologyLabel.setMinimumSize(new Dimension(53, 40));
+        ontologyLabel.setMaximumSize(new Dimension(300, 60));
+        panel_1.add(ontologyLabel);
+        ontologyLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        ontologyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ontologyLabel.setFocusable(false);
+        ontologyLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+
+        Filler filler_3 = new Filler(new Dimension(15, 0), new Dimension(20, 0), new Dimension(40, 0));
+        panel_1.add(filler_3);
+
+        ontologyField = new JTextField();
+        ontologyField.setMaximumSize(new Dimension(2147483647, 30));
+        panel_1.add(ontologyField);
+        ontologyField.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        ontologyField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                selectOntology();
+            }
+        });
+        ontologyField.setEditable(false);
+        ontologyField.setBackground(Color.WHITE);
+        ontologyField.setColumns(10);
+
+        Filler filler_4 = new Filler(new Dimension(2, 0), new Dimension(5, 0), new Dimension(40, 0));
+        panel_1.add(filler_4);
+
+        JButton ontologyChooseButton = new JButton("Choose...");
+        ontologyChooseButton.setPreferredSize(new Dimension(90, 27));
+        ontologyChooseButton.setMaximumSize(new Dimension(86, 44));
+        panel_1.add(ontologyChooseButton);
+        ontologyChooseButton.setFont(new Font("SansSerif", Font.BOLD, 12));
+
+        Filler filler_7 = new Filler(new Dimension(2, 0), new Dimension(5, 0), new Dimension(20, 0));
+        panel_1.add(filler_7);
+
+        Component verticalGlue_2 = Box.createVerticalGlue();
+        verticalGlue_2.setBackground(SystemColor.window);
+        getContentPane().add(verticalGlue_2);
+        ontologyChooseButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                selectOntology();
+            }
+        });
 
         init();
-        portField.setValue(port);
-        btnStart.setVisible(false);
 
     }
 
@@ -247,11 +312,11 @@ public class MainWindow extends JFrame {
             showErrorDialog(e.getMessage());
             return;
         } finally {
+            btnStart.setVisible(this.ontologyFileName != null);
             if (this.ontologyFileName == null)
                 ontologyField.setText("[NOT SET]");
             else
                 ontologyField.setText(this.ontologyFileName);
-            btnStart.setVisible(this.ontologyFileName != null);
         }
     }
 
@@ -264,7 +329,7 @@ public class MainWindow extends JFrame {
     }
 
     private void showErrorDialog(String error) {
-        JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     public static void main(String[] args) {
@@ -316,5 +381,4 @@ public class MainWindow extends JFrame {
             e1.printStackTrace();
         }
     }
-
 }
