@@ -18,6 +18,13 @@
         cm = CodeMirror.fromTextArea(field, {
             lineNumbers: true,
             mode: 'sparql',
+            smartIndent: false, // does not work properly
+            extraKeys: {
+                Tab: function(cm) {
+                    var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                    cm.replaceSelection(spaces);
+                }
+            },
         });
         cm.on('change', function(c) {
             lastChange = new Date();
@@ -53,8 +60,7 @@
             return;
         }
         t.createTHead();
-        document.getElementById('result-count').innerText = '';
-        document.getElementById('running').innerText = '';
+        document.getElementById('running-and-count').innerText = '';
         var tr = t.tHead.insertRow(-1);
         tr.appendChild(document.createElement('th'));
         for (var c of j['columns']) {
@@ -95,10 +101,9 @@
                 td.appendChild(s);
             }
         }
-        document.getElementById('result-count').innerText =
+        document.getElementById('running-and-count').innerText =
             (n == 0 ? 'No results.' :
              n == 1 ? 'One result.' : (n + ' results.'));
-        document.getElementById('running').innerText = '';
     }
 
     function submitQuery() {
@@ -106,8 +111,7 @@
             visibility = "hidden";
         var query = cm.getValue();
         clearTable(document.getElementById('result-table'));
-        document.getElementById('result-count').innerText = '';
-        document.getElementById('running').innerHTML =
+        document.getElementById('running-and-count').innerText = '';
             'Running&hellip;';
         var el = document.getElementById('error-result-msg');
         el.style.visibility = 'hidden';
@@ -122,20 +126,19 @@
             })
         }).then(async function(r) {
             if (!r.ok)
-                throw new Error(r.responseText + "\n" + await r.text());
+                throw new Error((r.responseText || '') + "\n" +
+                    await r.text());
             return r.json();
         }).then(function(j) {
             showResults(j);
             document.getElementById('submit-btn').style.
                 visibility = "visible";
-            document.getElementById('running').innerHTML = '';
         }).catch(function(e) {
             document.getElementById('submit-btn').style.
                 visibility = "visible";
-            document.getElementById('running').innerHTML = '';
             var m = document.getElementById('error-result-msg');
-            m.style.visiblity = 'visible';
-            m.innerText = e;
+            m.style.visibility = 'visible';
+            m.innerText = 'Unknown error.';
         });
     }
 

@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 
 import javax.json.Json;
@@ -57,6 +58,7 @@ public class MainWindow extends JFrame {
             + "/.config/sparql-gui-wrapper/config.json".replace("/", System.getProperty("file.separator"));
 
     private JTextField ontologyField;
+    private JButton btnStart;
 
     public MainWindow() {
         setResizable(false);
@@ -71,15 +73,15 @@ public class MainWindow extends JFrame {
         }
 
         setTitle("SPARQL GUI Wrapper");
-        setSize(896, 132);
+        setSize(900, 140);
 
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
-        JLabel ontologyLabel = new JLabel("<html>Inferred OWL ontology<br/>(RDF/XML format)</html>");
+        JLabel ontologyLabel = new JLabel("<html>Inferred OWL ontology<br/><small>(RDF/XML format)</small></html>");
         ontologyLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-        ontologyLabel.setBounds(12, 58, 138, 34);
+        ontologyLabel.setBounds(0, 47, 165, 58);
         ontologyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         ontologyLabel.setFocusable(false);
         ontologyLabel.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -95,7 +97,7 @@ public class MainWindow extends JFrame {
         });
         ontologyField.setEditable(false);
         ontologyField.setBackground(Color.WHITE);
-        ontologyField.setBounds(167, 58, 620, 34);
+        ontologyField.setBounds(177, 58, 610, 34);
         getContentPane().add(ontologyField);
         ontologyField.setColumns(10);
 
@@ -117,7 +119,7 @@ public class MainWindow extends JFrame {
         ((SpinnerNumberModel) portField.getModel()).setMaximum(65535);
         NumberEditor ne_portField = new JSpinner.NumberEditor(portField, "#");
         portField.setEditor(ne_portField);
-        portField.setBounds(80, 12, 70, 34);
+        portField.setBounds(86, 13, 79, 34);
         portField.getEditor().getComponent(0).setBackground(Color.WHITE);
         portField.addChangeListener(new ChangeListener() {
             @Override
@@ -132,10 +134,11 @@ public class MainWindow extends JFrame {
         portLabel.setHorizontalAlignment(SwingConstants.TRAILING);
         portLabel.setFocusable(false);
         portLabel.setAlignmentX(0.5f);
-        portLabel.setBounds(12, 12, 52, 34);
+        portLabel.setBounds(12, 12, 65, 34);
         getContentPane().add(portLabel);
 
         JLabel statusLabel = new JLabel("<html></html>");
+        statusLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
         statusLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent ev) {
@@ -154,8 +157,7 @@ public class MainWindow extends JFrame {
         statusLabel.setBounds(266, 12, 521, 34);
         getContentPane().add(statusLabel);
 
-        JButton btnStart = new JButton("Start");
-        btnStart.setVisible(false);
+        btnStart = new JButton("Start");
         btnStart.setFont(new Font("SansSerif", Font.BOLD, 12));
         btnStart.addActionListener(new ActionListener() {
             @Override
@@ -185,7 +187,7 @@ public class MainWindow extends JFrame {
                 btnStart.setEnabled(true);
             }
         });
-        btnStart.setBounds(167, 12, 93, 34);
+        btnStart.setBounds(177, 12, 83, 34);
 
         getContentPane().add(btnStart);
 
@@ -206,7 +208,7 @@ public class MainWindow extends JFrame {
 
         init();
         portField.setValue(port);
-        btnStart.setVisible(true);
+        btnStart.setVisible(false);
 
     }
 
@@ -249,6 +251,7 @@ public class MainWindow extends JFrame {
                 ontologyField.setText("[NOT SET]");
             else
                 ontologyField.setText(this.ontologyFileName);
+            btnStart.setVisible(this.ontologyFileName != null);
         }
     }
 
@@ -302,12 +305,12 @@ public class MainWindow extends JFrame {
             JsonReader parser = Json.createReader(new StringReader(cfg));
             JsonObject o = parser.readObject();
             ontologyFileName = o.getString("ontologyFileName", "");
-            if (ontologyFileName.isBlank())
+            if (ontologyFileName.isEmpty() || !new File(ontologyFileName).exists())
                 ontologyFileName = null;
             String lastQuery = o.getString("lastQuery", "");
             qm.setLastQuery(lastQuery);
             port = o.getInt("port", 8080);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NoSuchFileException e) {
             // do nothing
         } catch (IOException | IllegalStateException e1) {
             e1.printStackTrace();

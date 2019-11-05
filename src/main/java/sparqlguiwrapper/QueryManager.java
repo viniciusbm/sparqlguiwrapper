@@ -43,7 +43,7 @@ public class QueryManager {
             answerBuilder.add("URI", "");
         }
         answerBuilder.add("query", queryString);
-        if (!queryString.isBlank()) {
+        if (!queryString.isEmpty()) {
             lastQuery = queryString;
             try {
                 QueryFactory.create(queryString);
@@ -98,6 +98,13 @@ public class QueryManager {
                             break;
                         case "Long":
                             ob.add("value", l.getLong());
+                            break;
+                        case "BigInteger":
+                            try {
+                                ob.add("value", l.getLong());
+                            } catch (NumberFormatException e) {
+                                ob.add("value", l.toString());
+                            }
                             break;
                         case "Float":
                             ob.add("value", l.getFloat());

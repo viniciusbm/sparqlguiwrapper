@@ -23,12 +23,22 @@ formats other than RDF/XML.
 ### Binaries
 
 A JAR file can be downloaded [here](../../releases). It comes bundled with
-all dependencies, hence no external library is required.
+all dependencies, hence no external library is required. To execute it
+from the command line (with Java 8 or newer):
+
+    java -jar sparqlguiwrapper-<version>.jar
 
 ### Compilation
 
-This program can be build with [Maven](https://maven.apache.org/)
-(just run `mvn build`, or `mvn package` to obtain the JAR file).
+The source code can be compiled with [Maven](https://maven.apache.org/):
+
+    # Build
+    mvn compile
+    
+    # Run
+    mvn exec:java -Dexec.mainClass=sparqlguiwrapper.MainWindow
+
+A JAR file can be generated with `mvn package`.
 
 ### Licence
 

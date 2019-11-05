@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.json.Json;
 
@@ -32,9 +33,9 @@ public class Server extends NanoHTTPD {
                     uri = "/index.htm";
                 InputStream resource = Server.class.getResourceAsStream("/static" + uri);
                 String r;
-                try {
-                    r = new String(resource.readAllBytes());
-                } catch (IOException | NullPointerException e) {
+                try (Scanner s = new Scanner(resource)) {
+                    r = new String(s.useDelimiter("\\A").next());
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                     return newFixedLengthResponse(Status.NOT_FOUND, "", "");
                 }

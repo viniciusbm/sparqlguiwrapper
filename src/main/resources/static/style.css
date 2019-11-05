@@ -25,18 +25,11 @@
     width: 31%;
 }
 
-#result-count {
+#running-and-count {
     color: darkgreen;
     font-size: 120%;
-    min-width: 30vw;
-    text-align: right;
-}
-
-#running {
     min-width: 30vw;
     text-align: left;
-    font-size: 120%;
-    color: darkgreen;
 }
 
 #connection-msg {
@@ -108,6 +101,7 @@
 
 #ontology-corner {
     text-align: right;
+    word-break: break-all;
 }
 
 #result-table {
