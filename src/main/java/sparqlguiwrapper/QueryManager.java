@@ -156,10 +156,6 @@ public class QueryManager {
         this.ontologyFileName = fileName;
     }
 
-    public void refreshOntology() throws FileNotFoundException {
-        setOntologyFileName(ontologyFileName);
-    }
-
     public String getOntologyFileName() {
         return ontologyFileName;
     }

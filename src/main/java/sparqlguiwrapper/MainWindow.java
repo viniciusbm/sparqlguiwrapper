@@ -44,6 +44,7 @@ import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
@@ -287,7 +288,6 @@ public class MainWindow extends JFrame {
         });
         qm = new QueryManager();
         readConfigFile();
-        setOntologyFileName(ontologyFileName);
     }
 
     private void selectOntology() {
@@ -305,27 +305,29 @@ public class MainWindow extends JFrame {
     }
 
     private void setOntologyFileName(String ontologyFileName) {
-        try {
-            qm.setOntologyFileName(ontologyFileName);
-            this.ontologyFileName = ontologyFileName;
-        } catch (FileNotFoundException | IllegalArgumentException e) {
-            showErrorDialog(e.getMessage());
-            return;
-        } finally {
-            btnStart.setVisible(this.ontologyFileName != null);
-            if (this.ontologyFileName == null)
-                ontologyField.setText("[NOT SET]");
-            else
-                ontologyField.setText(this.ontologyFileName);
-        }
+        ontologyField.setText("[Reading ontology...]");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    qm.setOntologyFileName(ontologyFileName);
+                    MainWindow.this.ontologyFileName = ontologyFileName;
+                } catch (FileNotFoundException | IllegalArgumentException e) {
+                    showErrorDialog(e.getMessage());
+                    return;
+                } finally {
+                    btnStart.setVisible(MainWindow.this.ontologyFileName != null);
+                    if (MainWindow.this.ontologyFileName == null)
+                        ontologyField.setText("[NOT SET]");
+                    else
+                        ontologyField.setText(MainWindow.this.ontologyFileName);
+                }
+            }
+        });
     }
 
     private void refreshOntology() {
-        try {
-            qm.refreshOntology();
-        } catch (FileNotFoundException e) {
-            showErrorDialog(e.getMessage());
-        }
+        setOntologyFileName(ontologyFileName);
     }
 
     private void showErrorDialog(String error) {
@@ -369,9 +371,10 @@ public class MainWindow extends JFrame {
             String cfg = new String(Files.readAllBytes(Paths.get(configFileName)));
             JsonReader parser = Json.createReader(new StringReader(cfg));
             JsonObject o = parser.readObject();
-            ontologyFileName = o.getString("ontologyFileName", "");
-            if (ontologyFileName.isEmpty() || !new File(ontologyFileName).exists())
-                ontologyFileName = null;
+            String fn = o.getString("ontologyFileName", "");
+            if (fn.isEmpty())
+                fn = null;
+            setOntologyFileName(fn);
             String lastQuery = o.getString("lastQuery", "");
             qm.setLastQuery(lastQuery);
             port = o.getInt("port", 8080);
