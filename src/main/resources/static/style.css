@@ -10,6 +10,7 @@
     color: white;
     background-color: green;
     border-color: darkgreen;
+    visibility: hidden;
 }
 
 #submit-btn:hover {
@@ -17,8 +18,8 @@
 }
 
 #submit-btn:active {
-    position: relative;
-    top: 3px;
+    background-color: lightgreen;
+    color: darkgreen;
 }
 
 #header > div {

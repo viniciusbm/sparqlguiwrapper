@@ -304,7 +304,7 @@ public class MainWindow extends JFrame {
         }
     }
 
-    private void setOntologyFileName(String ontologyFileName) {
+    private void setOntologyFileName(String ontologyFileName, boolean silent) {
         ontologyField.setText("[Reading ontology...]");
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -313,7 +313,8 @@ public class MainWindow extends JFrame {
                     qm.setOntologyFileName(ontologyFileName);
                     MainWindow.this.ontologyFileName = ontologyFileName;
                 } catch (FileNotFoundException | IllegalArgumentException e) {
-                    showErrorDialog(e.getMessage());
+                    if (!silent)
+                        showErrorDialog(e.getMessage());
                     return;
                 } finally {
                     btnStart.setVisible(MainWindow.this.ontologyFileName != null);
@@ -324,6 +325,10 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+    }
+
+    private void setOntologyFileName(String ontologyFileName) {
+        setOntologyFileName(ontologyFileName, false);
     }
 
     private void refreshOntology() {
@@ -374,7 +379,7 @@ public class MainWindow extends JFrame {
             String fn = o.getString("ontologyFileName", "");
             if (fn.isEmpty())
                 fn = null;
-            setOntologyFileName(fn);
+            setOntologyFileName(fn, true);
             String lastQuery = o.getString("lastQuery", "");
             qm.setLastQuery(lastQuery);
             port = o.getInt("port", 8080);

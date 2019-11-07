@@ -8,6 +8,7 @@
     var checkOnNextPing = false;
     var lastChange = new Date(0);
     var errorTimeout = null;
+    var isRunningQuery = false;
 
     var tickInterval = 200;
     var pingInterval = 500;
@@ -21,8 +22,11 @@
             smartIndent: false, // does not work properly
             extraKeys: {
                 Tab: function(cm) {
-                    var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-                    cm.replaceSelection(spaces);
+                    var sp = Array(cm.getOption('indentUnit') + 1).join(' ');
+                    cm.replaceSelection(sp);
+                },
+                'Ctrl-Enter': function(cm) {
+                    document.getElementById('submit-btn').click();
                 }
             },
         });
@@ -50,6 +54,13 @@
         }
     }
 
+    function needsQuote(t) {
+        t = t.toLowerCase();
+        return t.endsWith('name') || t.endsWith('token') ||
+            t.endsWith('language') || t.endsWith('literal') ||
+            t.endsWith('uri') || t.endsWith('string');
+    }
+
     function showResults(j) {
         var t = document.getElementById('result-table');
         clearTable(t);
@@ -57,6 +68,7 @@
             var m = document.getElementById('error-result-msg');
             m.style.visibility = 'visible';
             m.innerText = j['error'];
+            document.getElementById('running-and-count').innerText = '';
             return;
         }
         t.createTHead();
@@ -79,8 +91,18 @@
                 td.appendChild(s);
                 if (c['isLiteral']) {
                     td.className = 'literal';
-                    var q = typeof c['value'] === 'string' ? '"' : '';
-                    td.innerText = q + c['value'] + q;
+                    var q = '';
+                    var v = c['value']
+                    if (typeof v === 'string') {
+                        q = '"';
+                        if (v.endsWith('^^' + c['type'])) {
+                            if (!needsQuote(c['type']))
+                                q = '';
+                            v = v.substring(0, v.length
+                                    - c['type'].length - 2);
+                        }
+                    }
+                    td.innerText = q + v + q;
                     s.className = 'type';
                     s.innerText = c['type'];
                     s.innerHTML = '<b>Type: </b>' + s.innerHTML;
@@ -107,11 +129,11 @@
     }
 
     function submitQuery() {
-        document.getElementById('submit-btn').style.
-            visibility = "hidden";
+        isRunningQuery = true;
+        document.getElementById('submit-btn').style.visibility = 'hidden';
         var query = cm.getValue();
         clearTable(document.getElementById('result-table'));
-        document.getElementById('running-and-count').innerText = '';
+        document.getElementById('running-and-count').innerHTML =
             'Running&hellip;';
         var el = document.getElementById('error-result-msg');
         el.style.visibility = 'hidden';
@@ -125,6 +147,7 @@
                 query: query
             })
         }).then(async function(r) {
+            isRunningQuery = false;
             if (!r.ok)
                 throw new Error((r.responseText || '') + "\n" +
                     await r.text());
@@ -132,10 +155,11 @@
         }).then(function(j) {
             showResults(j);
             document.getElementById('submit-btn').style.
-                visibility = "visible";
+                visibility = 'visible';
         }).catch(function(e) {
+            isRunningQuery = false;
             document.getElementById('submit-btn').style.
-                visibility = "visible";
+                visibility = 'visible';
             var m = document.getElementById('error-result-msg');
             m.style.visibility = 'visible';
             m.innerText = 'Unknown error.';
@@ -196,13 +220,23 @@
                     clearInlineError();
                 }
             }
+            if (!isRunningQuery)
+                document.getElementById('submit-btn').style.
+                    visibility = 'visible';
             setTimeout(ping, pingInterval);
         }).catch(function(e) {
-            setTimeout(ping, pingInterval);
             var el = document.querySelector('#connection-msg .no');
             el.style.display = 'inline';
             el = document.querySelector('#connection-msg .yes');
             el.style.display = 'none';
+            var fnLabel = document.getElementById('ontology-fn');
+            var uriLabel = document.getElementById('ontology-uri');
+            if (fnLabel.innerText != '[NOT SET]')
+                fnLabel.innerText = '[NOT SET]';
+            if (uriLabel.innerText != '[UNKNOWN]')
+                uriLabel.innerText = '[UNKNOWN]';
+            document.getElementById('submit-btn').style.visibility = 'hidden';
+            setTimeout(ping, pingInterval);
         });
     }
 

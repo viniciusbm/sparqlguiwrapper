@@ -83,44 +83,45 @@ public class QueryManager {
                         JsonObjectBuilder ob = Json.createObjectBuilder().add("isLiteral", true).add("type", type);
                         String cn = l.getDatatype().getJavaClass() == null ? "null"
                                 : l.getDatatype().getJavaClass().getSimpleName();
-                        switch (cn) {
-                        case "Character":
-                            ob.add("value", l.getChar());
-                            break;
-                        case "Byte":
-                            ob.add("value", l.getByte());
-                            break;
-                        case "Short":
-                            ob.add("value", l.getShort());
-                            break;
-                        case "Integer":
-                            ob.add("value", l.getInt());
-                            break;
-                        case "Long":
-                            ob.add("value", l.getLong());
-                            break;
-                        case "BigInteger":
-                            try {
+                        try {
+                            switch (cn) {
+                            case "Character":
+                                ob.add("value", l.getChar());
+                                break;
+                            case "Byte":
+                                ob.add("value", l.getByte());
+                                break;
+                            case "Short":
+                                ob.add("value", l.getShort());
+                                break;
+                            case "Integer":
+                                ob.add("value", l.getInt());
+                                break;
+                            case "Long":
                                 ob.add("value", l.getLong());
-                            } catch (NumberFormatException e) {
+                                break;
+                            case "BigInteger":
+                                ob.add("value", l.getLong());
+                                break;
+                            case "Float":
+                                ob.add("value", l.getFloat());
+                                break;
+                            case "Double":
+                            case "BigDecimal":
+                                ob.add("value", l.getDouble());
+                                break;
+                            case "String":
+                                ob.add("value", l.getString());
+                                break;
+                            case "Boolean":
+                                ob.add("value", l.getBoolean());
+                                break;
+                            default:
                                 ob.add("value", l.toString());
+                                break;
                             }
-                            break;
-                        case "Float":
-                            ob.add("value", l.getFloat());
-                            break;
-                        case "Double":
-                            ob.add("value", l.getDouble());
-                            break;
-                        case "String":
-                            ob.add("value", l.getString());
-                            break;
-                        case "Boolean":
-                            ob.add("value", l.getBoolean());
-                            break;
-                        default:
+                        } catch (Exception e) {
                             ob.add("value", l.toString());
-                            break;
                         }
                         row.add(ob);
                     } else {
