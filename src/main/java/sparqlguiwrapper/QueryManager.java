@@ -128,6 +128,8 @@ public class QueryManager {
                         Resource r = cell.asResource();
                         String localName = r.getLocalName();
                         String fullName = r.toString();
+                        if (localName.isEmpty())
+                            localName = fullName.substring(fullName.indexOf('#') + 1);
                         row.add(Json.createObjectBuilder().add("isLiteral", false).add("localName", localName)
                                 .add("fullName", fullName));
                     }

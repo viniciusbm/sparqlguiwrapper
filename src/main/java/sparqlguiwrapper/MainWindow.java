@@ -339,6 +339,11 @@ public class MainWindow extends JFrame {
         JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    private boolean showQuestionDialog(String question, String title) {
+        return JOptionPane.showConfirmDialog(this, question, title,
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+    }
+
     public static void main(String[] args) {
 
         EventQueue.invokeLater(() -> {
@@ -377,9 +382,21 @@ public class MainWindow extends JFrame {
             JsonReader parser = Json.createReader(new StringReader(cfg));
             JsonObject o = parser.readObject();
             String fn = o.getString("ontologyFileName", "");
-            if (fn.isEmpty())
-                fn = null;
-            setOntologyFileName(fn, true);
+            if (fn.isEmpty()) {
+                setOntologyFileName(null, true);
+            } else {
+                if (showQuestionDialog("Do you want to open the following ontology again?\n" + fn, "Reopen ontology?"))
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setOntologyFileName(fn);
+                        }
+                    });
+
+                else
+                    setOntologyFileName(null, true);
+            }
             String lastQuery = o.getString("lastQuery", "");
             qm.setLastQuery(lastQuery);
             port = o.getInt("port", 8080);
