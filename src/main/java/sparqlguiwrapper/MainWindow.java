@@ -68,6 +68,7 @@ public class MainWindow extends JFrame {
     private JButton btnStart;
     private final Component verticalGlue = Box.createVerticalGlue();
     private JLabel statusLabel;
+    private JButton btnRefreshOntology;
 
     public MainWindow() {
         if (SystemUtils.IS_OS_WINDOWS)
@@ -114,7 +115,9 @@ public class MainWindow extends JFrame {
         panel.add(filler_2);
 
         JSpinner portField = new JSpinner();
-        portField.setMaximumSize(new Dimension(32767, 40));
+        portField.setPreferredSize(new Dimension(72, 44));
+        portField.setMinimumSize(new Dimension(27, 44));
+        portField.setMaximumSize(new Dimension(400, 44));
         panel.add(portField);
         portField.setFont(new Font("SansSerif", Font.BOLD, 12));
         portField.setValue(port);
@@ -160,7 +163,8 @@ public class MainWindow extends JFrame {
                     server.stop();
                     server = null;
                     portField.setEnabled(true);
-                    statusLabel.setText("");
+                    statusLabel.setText("<html></html>");
+
                     btnStart.setText("Start");
                     statusLabel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -196,20 +200,20 @@ public class MainWindow extends JFrame {
         Filler filler_1 = new Box.Filler(new Dimension(2, 0), new Dimension(20, 0), new Dimension(Short.MAX_VALUE, 0));
         panel.add(filler_1);
 
-        JButton btnrefreshontology = new JButton("<html>Refresh<br/>ontology</html>");
-        btnrefreshontology.setMaximumSize(new Dimension(300, 44));
-        btnrefreshontology.setPreferredSize(new Dimension(90, 44));
-        btnrefreshontology.setMinimumSize(new Dimension(88, 44));
-        panel.add(btnrefreshontology);
-        btnrefreshontology.addActionListener(new ActionListener() {
+        btnRefreshOntology = new JButton("<html>Refresh<br/>ontology</html>");
+        btnRefreshOntology.setMaximumSize(new Dimension(300, 44));
+        btnRefreshOntology.setPreferredSize(new Dimension(90, 44));
+        btnRefreshOntology.setMinimumSize(new Dimension(88, 44));
+        panel.add(btnRefreshOntology);
+        btnRefreshOntology.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                btnrefreshontology.setEnabled(false);
+                btnRefreshOntology.setEnabled(false);
                 refreshOntology();
-                btnrefreshontology.setEnabled(true);
+                btnRefreshOntology.setEnabled(true);
             }
         });
-        btnrefreshontology.setFont(new Font("SansSerif", Font.BOLD, 11));
+        btnRefreshOntology.setFont(new Font("SansSerif", Font.BOLD, 11));
 
         Filler filler_6 = new Filler(new Dimension(2, 0), new Dimension(5, 0), new Dimension(20, 0));
         panel.add(filler_6);
@@ -306,6 +310,7 @@ public class MainWindow extends JFrame {
 
     private void setOntologyFileName(String ontologyFileName, boolean silent) {
         ontologyField.setText("[Reading ontology...]");
+        btnRefreshOntology.setVisible(false);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -317,8 +322,10 @@ public class MainWindow extends JFrame {
                         showErrorDialog(e.getMessage());
                     return;
                 } finally {
-                    btnStart.setVisible(MainWindow.this.ontologyFileName != null);
-                    if (MainWindow.this.ontologyFileName == null)
+                    boolean enabled = MainWindow.this.ontologyFileName != null;
+                    btnStart.setVisible(enabled);
+                    btnRefreshOntology.setVisible(enabled);
+                    if (!enabled)
                         ontologyField.setText("[NOT SET]");
                     else
                         ontologyField.setText(MainWindow.this.ontologyFileName);
