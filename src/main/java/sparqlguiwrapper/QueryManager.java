@@ -117,12 +117,13 @@ public class QueryManager {
                                 ob.add("value", l.getBoolean());
                                 break;
                             default:
-                                ob.add("value", l.toString());
+                                ob.add("value", (String) l.getValue());
                                 break;
                             }
                         } catch (Exception e) {
-                            ob.add("value", l.toString());
+                            ob.add("value", (String) l.getValue());
                         }
+                        ob.add("language", l.getLanguage());
                         row.add(ob);
                     } else {
                         Resource r = cell.asResource();

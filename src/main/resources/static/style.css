@@ -180,6 +180,16 @@
     color: #1E5728;
 }
 
+.literal .lang {
+    background-color: #1E5728;
+    color: white;
+    font-weight: bold;
+    border-radius: 9999999px;
+    padding: 0em 0.2em 0.1em 0.2em;
+    font-variant: small-caps;
+    margin-left: 5px;
+}
+
 #result-table td,
 #result-table th {
     border: 1px solid grey;

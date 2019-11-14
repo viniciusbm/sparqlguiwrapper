@@ -88,7 +88,6 @@
             for (var c of row) {
                 var td = tr.insertCell(-1);
                 var s = document.createElement('span');
-                td.appendChild(s);
                 if (c['isLiteral']) {
                     td.className = 'literal';
                     var q = '';
@@ -106,6 +105,12 @@
                     s.className = 'type';
                     s.innerText = c['type'];
                     s.innerHTML = '<b>Type: </b>' + s.innerHTML;
+                    if (c['language']) {
+                        var lang = document.createElement('span');
+                        lang.className = 'lang';
+                        lang.innerText = c['language'];
+                        td.appendChild(lang);
+                    }
                 } else {
                     if (typeof c['fullName'] !== 'undefined') {
                         td.className = 'resource';
