@@ -121,7 +121,11 @@ public class QueryManager {
                                 break;
                             }
                         } catch (Exception e) {
-                            ob.add("value", (String) l.getValue());
+                            try {
+                                ob.add("value", (String) l.getValue());
+                            } catch (ClassCastException ee) {
+                                ob.add("value", l.toString());
+                            }
                         }
                         ob.add("language", l.getLanguage());
                         row.add(ob);
